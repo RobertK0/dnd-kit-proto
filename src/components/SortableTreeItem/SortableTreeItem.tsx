@@ -11,6 +11,8 @@ import { TreeItem, TreeItemProps } from "../TreeItem/TreeItem";
 
 interface Props extends TreeItemProps {
   id: UniqueIdentifier;
+  containerId: string;
+  label: string;
 }
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
@@ -18,7 +20,28 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
   wasDragging,
 }) => (isSorting || wasDragging ? false : true);
 
-export function SortableTreeItem({ id, depth, ...props }: Props) {
+export function SortableTreeItem({
+  id,
+  depth,
+  label,
+  containerId,
+  ...props
+}: Props) {
+  const hookParams = {
+    id,
+    data: {
+      container: containerId,
+      item: {
+        id,
+        label,
+      } as {
+        id: UniqueIdentifier;
+        label: string;
+      },
+    },
+    animateLayoutChanges,
+  };
+
   const {
     attributes,
     isDragging,
@@ -28,23 +51,26 @@ export function SortableTreeItem({ id, depth, ...props }: Props) {
     setDroppableNodeRef,
     transform,
     transition,
-  } = useSortable({
-    id,
-    animateLayoutChanges,
-  });
+  } = useSortable(hookParams);
+
   const style: CSSProperties = {
     transform: CSS.Translate.toString(transform),
     transition,
+    minWidth: 600,
   };
 
   return (
     <TreeItem
       ref={setDraggableNodeRef}
       wrapperRef={setDroppableNodeRef}
+      label={label}
       style={style}
       depth={depth}
+      dragging={isDragging}
       ghost={isDragging}
+      // ghost={false}
       disableSelection={iOS}
+      transform={transform}
       disableInteraction={isSorting}
       handleProps={{
         ...attributes,

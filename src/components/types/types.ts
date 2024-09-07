@@ -5,14 +5,19 @@ export interface TreeItem {
   id: UniqueIdentifier;
   children: TreeItem[];
   collapsed?: boolean;
+  label: string;
 }
 
 export type TreeItems = TreeItem[];
 
-export interface FlattenedItem extends TreeItem {
+export interface FlattenedItem {
+  id: UniqueIdentifier;
+  children: TreeItem[];
+  collapsed?: boolean;
   parentId: UniqueIdentifier | null;
   depth: number;
   index: number;
+  label: string;
 }
 
 export type SensorContext = MutableRefObject<{

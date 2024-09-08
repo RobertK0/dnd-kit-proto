@@ -5,12 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  DragStartEvent,
-  DragEndEvent,
-  UniqueIdentifier,
-  useDndMonitor,
-} from "@dnd-kit/core";
+import { UniqueIdentifier, useDndMonitor } from "@dnd-kit/core";
 import {
   SortableContext,
   arrayMove,
@@ -19,7 +14,6 @@ import {
 
 import {
   buildTree,
-  createRange,
   flattenTree,
   getProjection,
   removeChildrenOf,
@@ -29,11 +23,9 @@ import {
 
 import { FlattenedItem } from "../types/types";
 import { SortableTreeItem } from "../SortableTreeItem/SortableTreeItem";
-import { SOURCE_ITEMS } from "../Vendor/Vendor";
-import { Item } from "../MultipleContainersContext/MultipleContainersContext";
 import { nanoid } from "nanoid";
 import { MultipleContainersOverlay } from "../MultipleContainersOverlay/MultipleContainersOverlay";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { itemBeingEdited, itemsData } from "../../store/items";
 
 interface Props {
@@ -87,9 +79,6 @@ export function SortableTree({
     () => flattenedItems.map(({ id }) => id),
     [flattenedItems]
   );
-  const activeItem = activeId
-    ? flattenedItems.find(({ id }) => id === activeId)
-    : null;
 
   // useEffect(() => {
   //   sensorContext.current = {
@@ -139,12 +128,14 @@ export function SortableTree({
 
       if (activeContainer !== overContainer) {
         setItems((items) => {
-          const overIndex = items.findIndex(
-            ({ id }) => id === overId
-          );
-          const activeIndex = SOURCE_ITEMS.findIndex(
-            ({ id }) => id === active.id
-          );
+          // TODO find index at which to insert
+          //
+          // const overIndex = items.findIndex(
+          //   ({ id }) => id === overId
+          // );
+          // const activeIndex = SOURCE_ITEMS.findIndex(
+          //   ({ id }) => id === active.id
+          // );
 
           const {
             id,
@@ -166,6 +157,33 @@ export function SortableTree({
               type,
             },
           ];
+
+          // TODO find index at which to insert
+          //
+          // let newIndex: number;
+
+          // if (over.id in items) {
+          //   newIndex = items.length + 1;
+          // } else {
+          //   const isBelowOverItem =
+          //     over &&
+          //     active.rect.current.translated &&
+          //     active.rect.current.translated.top >
+          //       over.rect.top + over.rect.height;
+
+          //   const modifier = isBelowOverItem ? 1 : 0;
+
+          //   newIndex =
+          //     overIndex >= 0
+          //       ? overIndex + modifier
+          //       : items.length + 1;
+          // }
+
+          // return [
+          //   ...items.slice(0, newIndex),
+          //   SOURCE_ITEMS[activeIndex],
+          //   ...items.slice(newIndex, items.length),
+          // ];
         });
       }
     },
@@ -281,7 +299,7 @@ export function SortableTree({
 
   //END
 
-  const [editedId, setEditedId] = useAtom(itemBeingEdited);
+  const editedId = useAtomValue(itemBeingEdited);
 
   return (
     <SortableContext
@@ -328,56 +346,11 @@ export function SortableTree({
     </SortableContext>
   );
 
-  function handleDragStart({
-    active: { id: activeId },
-  }: DragStartEvent) {
-    // console.log("flattenedItems", flattenedItems);
-    // setActiveId(activeId);
-    // setOverId(activeId);
-    // const activeItem = flattenedItems.find(
-    //   ({ id }) => id === activeId
-    // );
-    // if (activeItem) {
-    // setCurrentPosition({
-    //   parentId: activeItem.parentId,
-    //   overId: activeId,
-    // });
-    // }
-    document.body.style.setProperty("cursor", "grabbing");
-  }
-
-  function handleDragEnd({ active, over }: DragEndEvent) {
-    resetState();
-    if (projected && over) {
-      const { depth, parentId } = projected;
-      const clonedItems: FlattenedItem[] = JSON.parse(
-        JSON.stringify(flattenTree(items))
-      );
-      const overIndex = clonedItems.findIndex(
-        ({ id }) => id === over.id
-      );
-      const activeIndex = clonedItems.findIndex(
-        ({ id }) => id === active.id
-      );
-      const activeTreeItem = clonedItems[activeIndex];
-      clonedItems[activeIndex] = {
-        ...activeTreeItem,
-        depth,
-        parentId,
-      };
-      const sortedItems = arrayMove(
-        clonedItems,
-        activeIndex,
-        overIndex
-      );
-      const newItems = buildTree(sortedItems);
-      setItems(newItems);
-    }
-  }
-
-  function handleDragCancel() {
-    resetState();
-  }
+  //TODO implement drag cancel
+  //
+  // function handleDragCancel() {
+  //   resetState();
+  // }
 
   function resetState() {
     setOverId(null);

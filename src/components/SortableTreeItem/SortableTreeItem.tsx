@@ -71,9 +71,10 @@ export function SortableTreeItem({
     transition: `${transition}, background 0.2s ease, color 0.2s ease`,
     minWidth: 600,
     cursor: "pointer",
-
+    border: "none",
     background: selected ? "#AE1065" : "#f3f3f3",
     color: selected ? "white" : "#1c1c1c",
+    margin: "5px 0",
   };
 
   return (

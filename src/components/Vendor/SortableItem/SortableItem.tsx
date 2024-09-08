@@ -59,6 +59,14 @@ export function SortableItem({
 
   return (
     <Item
+      style={{
+        backgroundColor: "#FDF0F7",
+        borderRadius: 2,
+        border: "none",
+        boxShadow: "none",
+        color: "#AE1065",
+        padding: "10px 15px",
+      }}
       ref={disabled ? undefined : setNodeRef}
       value={label}
       dragging={isDragging}

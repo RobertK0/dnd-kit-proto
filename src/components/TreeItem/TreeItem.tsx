@@ -24,7 +24,6 @@ export interface TreeItemProps
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
-  transform: any;
 }
 
 export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
@@ -42,7 +41,6 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
       type,
       indicator,
       collapsed,
-      transform,
       onCollapse,
       onRemove,
       style,

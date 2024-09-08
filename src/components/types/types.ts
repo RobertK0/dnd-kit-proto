@@ -22,6 +22,7 @@ export interface FlattenedItem {
   type: string;
   label: string;
   canHaveChildren: boolean;
+  isConstructor: boolean;
 }
 
 export type SensorContext = MutableRefObject<{

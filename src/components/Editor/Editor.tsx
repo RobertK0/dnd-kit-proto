@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { itemBeingEdited, itemsData } from "../../store/items";
 import { buildTree, flattenTree } from "../utilities/utilities";
 import { ChangeEvent, useMemo } from "react";
@@ -33,7 +33,7 @@ const StyledTypeBadge = styled.span`
 
 export const Editor = () => {
   const [items, setItems] = useAtom(itemsData);
-  const [editedId, setEditedId] = useAtom(itemBeingEdited);
+  const editedId = useAtomValue(itemBeingEdited);
 
   const flattenedItems = useMemo(() => {
     return flattenTree(items);
@@ -44,7 +44,7 @@ export const Editor = () => {
   }, [editedId, flattenedItems]);
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setItems((prev) => {
+    setItems(() => {
       const editedItemIndex = flattenedItems.findIndex(
         (item) => item.id === editedId
       );

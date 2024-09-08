@@ -4,6 +4,7 @@ import {
   DragOverlay,
   type DragStartEvent,
   type DropAnimation,
+  Modifier,
   UniqueIdentifier,
   useDndMonitor,
 } from "@dnd-kit/core";
@@ -53,6 +54,7 @@ export function MultipleContainersOverlay() {
     <DragOverlay
       adjustScale={false}
       dropAnimation={useAnimation.current ? dropAnimation : null}
+      modifiers={[adjustTranslate]}
     >
       {activeItem ? (
         <Item value={activeItem.label} handle={false} dragOverlay />
@@ -61,3 +63,10 @@ export function MultipleContainersOverlay() {
     document.body
   );
 }
+
+const adjustTranslate: Modifier = ({ transform }) => {
+  return {
+    ...transform,
+    y: transform.y - 30,
+  };
+};

@@ -1,29 +1,13 @@
-import React, {
+import {
   Dispatch,
   SetStateAction,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
 import {
-  Announcements,
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
   DragStartEvent,
-  DragOverlay,
-  DragMoveEvent,
   DragEndEvent,
-  DragOverEvent,
-  MeasuringStrategy,
-  DropAnimation,
-  Modifier,
-  defaultDropAnimation,
   UniqueIdentifier,
   useDndMonitor,
 } from "@dnd-kit/core";
@@ -33,66 +17,24 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import { CSS } from "@dnd-kit/utilities";
 import {
   buildTree,
   createRange,
   flattenTree,
-  getChildCount,
   getProjection,
   removeChildrenOf,
   removeItem,
   setProperty,
-  sortableTreeKeyboardCoordinates,
 } from "../utilities/utilities";
 
-import {
-  FlattenedItem,
-  SensorContext,
-  TreeItems,
-} from "../types/types";
+import { FlattenedItem } from "../types/types";
 import { SortableTreeItem } from "../SortableTreeItem/SortableTreeItem";
 import { SOURCE_ITEMS } from "../Vendor/Vendor";
 import { Item } from "../MultipleContainersContext/MultipleContainersContext";
-import { SortableItem } from "../Vendor/SortableItem/SortableItem";
 import { nanoid } from "nanoid";
 import { MultipleContainersOverlay } from "../MultipleContainersOverlay/MultipleContainersOverlay";
 import { useAtom } from "jotai";
 import { itemBeingEdited, itemsData } from "../../store/items";
-
-let nextId = 5;
-
-const measuring = {
-  droppable: {
-    strategy: MeasuringStrategy.Always,
-  },
-};
-
-const dropAnimationConfig: DropAnimation = {
-  keyframes({ transform }) {
-    return [
-      {
-        opacity: 1,
-        transform: CSS.Transform.toString(transform.initial),
-      },
-      {
-        opacity: 0,
-        transform: CSS.Transform.toString({
-          ...transform.final,
-          x: transform.final.x + 5,
-          y: transform.final.y + 5,
-        }),
-      },
-    ];
-  },
-  easing: "ease-out",
-  sideEffects({ active }) {
-    active.node.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: defaultDropAnimation.duration,
-      easing: defaultDropAnimation.easing,
-    });
-  },
-};
 
 interface Props {
   collapsible?: boolean;
@@ -109,8 +51,6 @@ export function SortableTree({
   removable,
   setIsSidebarOpen,
 }: Props) {
-  // const [items, setItems] = useState(() => defaultItems);
-
   const [items, setItems] = useAtom(itemsData);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(
     null
@@ -418,28 +358,8 @@ export function SortableTree({
 
   const [editedId, setEditedId] = useAtom(itemBeingEdited);
 
-  useEffect(() => {
-    console.log("utilities", flattenedItems);
-    console.log(
-      "test",
-      flattenedItems.map(({ id }) => id)
-    );
-  }, [flattenedItems]);
-
   return (
-    // <DndContext
-    //   accessibility={{ announcements }}
-    //   sensors={sensors}
-    //   collisionDetection={closestCenter}
-    //   measuring={measuring}
-    //   onDragStart={handleDragStart}
-    //   onDragMove={handleDragMove}
-    //   onDragOver={handleDragOver}
-    //   onDragEnd={handleDragEnd}
-    //   onDragCancel={handleDragCancel}
-    // >
     <SortableContext
-      // items={sortedIds}
       items={flattenedItems.map(({ id }) => id)}
       strategy={verticalListSortingStrategy}
     >
@@ -479,51 +399,8 @@ export function SortableTree({
           />
         )
       )}
-      {/* {destinationItems.map((value, index) => (
-        <SortableItem
-          key={value.id}
-          id={value.id}
-          label={value.label}
-          index={index}
-          handle={false}
-          containerId={"B"}
-        />
-      ))} */}
-      {/* {flattenedItems.map(
-        ({ id, label, children, collapsed, depth }, index) => (
-          <>
-            <SortableTreeItem
-              containerId={"B"}
-              label={label}
-              key={id}
-              id={id}
-              value={id}
-              // depth={
-              //   id === activeId && projected
-              //     ? projected.depth
-              //     : depth
-              // }
-              depth={0}
-              indentationWidth={indentationWidth}
-              indicator={indicator}
-              // collapsed={Boolean(collapsed && children.length)}
-              collapsed={false}
-              // onCollapse={
-              //   collapsible && children.length
-              //     ? () => handleCollapse(id)
-              //     : undefined
-              // }
-              onCollapse={undefined}
-              onRemove={
-                removable ? () => handleRemove(id) : undefined
-              }
-            />
-          </>
-        )
-      )} */}
       <MultipleContainersOverlay />
     </SortableContext>
-    // </DndContext>
   );
 
   function handleDragStart({
@@ -599,10 +476,3 @@ export function SortableTree({
     );
   }
 }
-
-const adjustTranslate: Modifier = ({ transform }) => {
-  return {
-    ...transform,
-    y: transform.y - 25,
-  };
-};

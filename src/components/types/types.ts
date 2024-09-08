@@ -12,10 +12,16 @@ export interface TreeItem {
 
 export type TreeItems = TreeItem[];
 
-export interface FlattenedItem extends TreeItem {
+export interface FlattenedItem {
+  id: UniqueIdentifier;
+  children: TreeItem[];
+  collapsed?: boolean;
   parentId: UniqueIdentifier | null;
   depth: number;
   index: number;
+  type: string;
+  label: string;
+  canHaveChildren: boolean;
   isConstructor: boolean;
 }
 

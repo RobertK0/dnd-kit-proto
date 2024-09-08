@@ -104,7 +104,7 @@ function flatten(
   return items.reduce<FlattenedItem[]>((acc, item, index) => {
     return [
       ...acc,
-      { ...item, parentId, depth, index, isConstructor: false },
+      { ...item, parentId, depth, index },
       ...flatten(item.children, item.id, depth + 1),
     ];
   }, []);
@@ -131,11 +131,11 @@ export function buildTree(
   }));
 
   for (const item of items) {
-    const { id, children, label, type, canHaveChildren } = item;
+    const { id, children } = item;
     const parentId = item.parentId ?? root.id;
     const parent = nodes[parentId] ?? findItem(items, parentId);
 
-    nodes[id] = { id, children, label, type, canHaveChildren };
+    nodes[id] = { id, children };
     parent.children.push(item);
   }
 

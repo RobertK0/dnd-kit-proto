@@ -88,12 +88,10 @@ export function SortableTreeItem({
       label={label}
       style={style}
       depth={depth}
-      dragging={isDragging}
       type={type}
       ghost={isDragging}
       // ghost={false}
       disableSelection={iOS}
-      transform={transform}
       disableInteraction={isSorting}
       handleProps={{
         ...attributes,

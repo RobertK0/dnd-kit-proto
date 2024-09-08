@@ -87,12 +87,7 @@ export function MultipleContainersOverlay() {
       dropAnimation={useAnimation.current ? dropAnimation : null}
     >
       {activeItem ? (
-        <Item
-          value={activeItem.label}
-          handle={false}
-          color={"#ffff00"}
-          dragOverlay
-        />
+        <Item value={activeItem.label} handle={false} dragOverlay />
       ) : null}
     </DragOverlay>,
     document.body

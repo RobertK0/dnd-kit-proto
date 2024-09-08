@@ -207,7 +207,6 @@ export function SortableTree({
           event.active.data.current.container === "A" ? 79 : 0;
 
       setOffsetLeft(event.delta.x - dragStartPosition.current);
-      //event.over.rect.left
     },
     onDragOver({ active, over }) {
       console.log("dndmonitor ondragover");
@@ -523,25 +522,6 @@ export function SortableTree({
         )
       )} */}
       <MultipleContainersOverlay />
-
-      {/* {createPortal(
-        <DragOverlay
-          dropAnimation={dropAnimationConfig}
-          modifiers={indicator ? [adjustTranslate] : undefined}
-        >
-          {activeId && activeItem ? (
-            <SortableTreeItem
-              id={activeId}
-              depth={activeItem.depth}
-              clone
-              childCount={getChildCount(items, activeId) + 1}
-              value={activeId.toString()}
-              indentationWidth={indentationWidth}
-            />
-          ) : null}
-        </DragOverlay>,
-        document.body
-      )} */}
     </SortableContext>
     // </DndContext>
   );
@@ -562,15 +542,6 @@ export function SortableTree({
       });
     }
     document.body.style.setProperty("cursor", "grabbing");
-  }
-
-  function handleDragMove({ delta }: DragMoveEvent) {
-    console.log("handling drag move");
-    setOffsetLeft(delta.x);
-  }
-
-  function handleDragOver({ over }: DragOverEvent) {
-    // setOverId(over?.id ?? null);
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {

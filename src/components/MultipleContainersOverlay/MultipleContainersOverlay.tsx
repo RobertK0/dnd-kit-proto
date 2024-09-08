@@ -1,6 +1,5 @@
 import { createPortal } from "react-dom";
 import {
-  defaultDropAnimation,
   defaultDropAnimationSideEffects,
   DragOverlay,
   type DragStartEvent,
@@ -8,10 +7,9 @@ import {
   UniqueIdentifier,
   useDndMonitor,
 } from "@dnd-kit/core";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Item } from "../Item/Item";
-import { CSS } from "@dnd-kit/utilities";
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -21,32 +19,6 @@ const dropAnimation: DropAnimation = {
       },
     },
   }),
-};
-
-const dropAnimationConfig: DropAnimation = {
-  keyframes({ transform }) {
-    return [
-      {
-        opacity: 1,
-        transform: CSS.Transform.toString(transform.initial),
-      },
-      {
-        opacity: 0,
-        transform: CSS.Transform.toString({
-          ...transform.final,
-          x: transform.final.x + 5,
-          y: transform.final.y + 5,
-        }),
-      },
-    ];
-  },
-  easing: "ease-out",
-  sideEffects({ active }) {
-    active.node.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: defaultDropAnimation.duration,
-      easing: defaultDropAnimation.easing,
-    });
-  },
 };
 
 export function MultipleContainersOverlay() {
@@ -67,7 +39,7 @@ export function MultipleContainersOverlay() {
       );
 
       useAnimation.current =
-        event.active.data.current.container === "B";
+        event.active.data.current?.container === "B";
     },
     onDragCancel() {
       setActiveItem(null);
@@ -76,10 +48,6 @@ export function MultipleContainersOverlay() {
       setActiveItem(null);
     },
   });
-
-  useEffect(() => {
-    console.log("active item in overlay", activeItem);
-  }, [activeItem]);
 
   return createPortal(
     <DragOverlay

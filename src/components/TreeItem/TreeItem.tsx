@@ -74,6 +74,87 @@ const StyledTreeItem = styled.div<{ $selected: boolean }>`
       : ``}
 `;
 
+const StyledWrapper = styled.li<{
+  $ghost: boolean | undefined;
+  $spacing: number;
+  $indicator: boolean | undefined;
+  $clone: boolean | undefined;
+  $disableInteraction: boolean | undefined;
+  $disableSelection: boolean | undefined;
+}>`
+  list-style: none;
+  box-sizing: border-box;
+  margin-bottom: -1px;
+  ${({ $spacing }) =>
+    css`
+      padding-left: ${$spacing}px;
+    `}
+
+  ${({ $ghost, $indicator }) =>
+    $ghost
+      ? css`
+          ${$indicator
+            ? css`
+                opacity: 1;
+                position: relative;
+                z-index: 1;
+                margin-bottom: -1px;
+
+                ${StyledTreeItem} {
+                  position: relative;
+                  padding: 0;
+                  height: 8px;
+                  border-color: #2389ff;
+                  background-color: #56a1f8;
+
+                  &:before {
+                    position: absolute;
+                    left: -8px;
+                    top: -4px;
+                    display: block;
+                    content: "";
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    border: 1px solid #2389ff;
+                    background-color: #ffffff;
+                  }
+
+                  > * {
+                    /* Items are hidden using height and opacity to retain focus */
+                    opacity: 0;
+                    height: 0;
+                  }
+                }
+              `
+            : css`
+                opacity: 0.5;
+              `}
+          & > * {
+            box-shadow: none;
+            background-color: transparent;
+          }
+        `
+      : ``}
+  ${({ $clone }) =>
+    $clone
+      ? css`
+          display: inline-block;
+          pointer-events: none;
+          padding: 0;
+          padding-left: 10px;
+          padding-top: 5px;
+
+          ${StyledTreeItem} {
+            padding-right: 24px;
+            border-radius: 4px;
+            box-shadow: 0px 15px 15px 0 rgba(34, 33, 81, 0.1);
+          }
+        `
+      : ``}
+  ${({ $ghost }) => ($ghost ? css`` : ``)}
+`;
+
 export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
   (
     {
@@ -101,21 +182,14 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
     ref
   ) => {
     return (
-      <li
-        className={classNames(
-          styles.Wrapper,
-          clone && styles.clone,
-          ghost && styles.ghost,
-          indicator && styles.indicator,
-          disableSelection && styles.disableSelection,
-          disableInteraction && styles.disableInteraction
-        )}
+      <StyledWrapper
+        $ghost={ghost}
+        $indicator={indicator}
+        $clone={clone}
+        $disableSelection={disableSelection}
+        $disableInteraction={disableInteraction}
+        $spacing={indentationWidth * depth}
         ref={wrapperRef}
-        style={
-          {
-            "--spacing": `${indentationWidth * depth}px`,
-          } as React.CSSProperties
-        }
         {...props}
       >
         <StyledTreeItem
@@ -148,7 +222,7 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
             <span className={styles.Count}>{childCount}</span>
           ) : null}
         </StyledTreeItem>
-      </li>
+      </StyledWrapper>
     );
   }
 );

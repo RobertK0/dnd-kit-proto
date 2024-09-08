@@ -53,7 +53,7 @@ export function SortableTree({
   const [offsetLeft, setOffsetLeft] = useState(0);
   const flattenedItems = useMemo(() => {
     const flattenedTree = flattenTree(items);
-    const collapsedItems = flattenedTree.reduce<string[]>(
+    const collapsedItems = flattenedTree.reduce<UniqueIdentifier[]>(
       (acc, { children, collapsed, id }) =>
         collapsed && children.length ? [...acc, id] : acc,
       []
@@ -74,68 +74,31 @@ export function SortableTree({
           indentationWidth
         )
       : null;
-  // const sensorContext: SensorContext = useRef({
-  //   items: flattenedItems,
-  //   offset: offsetLeft,
-  // });
-  // const [coordinateGetter] = useState(() =>
-  //   sortableTreeKeyboardCoordinates(
-  //     sensorContext,
-  //     indicator,
-  //     indentationWidth
-  //   )
-  // );
-  // const sensors = useSensors(
-  //   useSensor(PointerSensor),
-  // useSensor(KeyboardSensor, {
-  //   coordinateGetter,
-  // })
-  // );
 
   const sortedIds = useMemo(
     () => flattenedItems.map(({ id }) => id),
     [flattenedItems]
   );
 
-  // useEffect(() => {
-  //   sensorContext.current = {
-  //     items: flattenedItems,
-  //     offset: offsetLeft,
-  //   };
-  // }, [flattenedItems, offsetLeft]);
-
-  //START
-
-  const [clonedItems, setClonedItems] = useState<Item[] | null>(
-    null
-  );
-  const [destinationItems, setDestinationItems] = useState<Item[]>(
-    createRange<Item>(3, (index) => ({
-      id: `B${index + 1}`,
-      label: `B${index + 1}`,
-    }))
-  );
-
-  const dragStartPosition = useRef(null);
+  const dragStartPosition = useRef<number | null>(null);
 
   useDndMonitor({
     onDragStart(event) {
-      setClonedItems(destinationItems);
       setIsSidebarOpen(false);
-      console.log("dndmonitor ondragstart", event);
       document.body.style.setProperty("cursor", "grabbing");
     },
-    onDragMove(event) {
+    onDragMove({ active, delta }) {
+      if (!active.data.current) return;
       if (!dragStartPosition.current)
         dragStartPosition.current =
-          event.active.data.current.container === "A" ? 79 : 0;
+          active.data.current.container === "A" ? 79 : 0;
 
-      setOffsetLeft(event.delta.x - dragStartPosition.current);
+      setOffsetLeft(delta.x - dragStartPosition.current);
     },
     onDragOver({ active, over }) {
-      console.log("dndmonitor ondragover");
-      const overId = over?.id;
-      setOverId(overId);
+      if (over === null || over.id === null) return;
+
+      setOverId(over.id);
       setActiveId(active.id);
       const overContainer = over?.data.current?.container as
         | string
@@ -144,26 +107,14 @@ export function SortableTree({
         | string
         | undefined;
 
-      if (
-        overId == null ||
-        destinationItems.find(({ id }) => id === active.id)
-      ) {
-        return;
-      }
-
       if (!overContainer || !activeContainer) {
         return;
       }
 
       // We are moving to a new container and must move the object so that
       // it is rendered in that container's list
-      // console.log(
-      //   "We are moving to a new container and must move the object so that it is rendered in that container's list",
-      //   active,
-      //   over
-      // );
+
       if (activeContainer !== overContainer) {
-        // setDestinationItems((items) => {
         setItems((items) => {
           // TODO find index at which to insert
           //
@@ -180,7 +131,7 @@ export function SortableTree({
             isConstructor,
             canHaveChildren,
             type,
-          } = active.data.current.item;
+          } = active.data.current?.item;
 
           return [
             ...items,
@@ -228,8 +179,6 @@ export function SortableTree({
       resetState();
       dragStartPosition.current = null;
 
-      console.log("OVER EVENT", items);
-
       if (!projected || !over) return;
 
       const { depth, parentId } = projected;
@@ -250,11 +199,7 @@ export function SortableTree({
 
       //Item being dropped
       const activeTreeItem = clonedItems[activeIndex];
-      console.log(
-        "utilities,",
-        activeTreeItem.isConstructor,
-        activeTreeItem.id
-      );
+
       const id = activeTreeItem.isConstructor
         ? nanoid(6)
         : activeTreeItem.id;
@@ -331,13 +276,12 @@ export function SortableTree({
       // }
     },
     onDragCancel() {
-      if (clonedItems) {
-        // Reset items to their original state in case items have been
-        // Dragged across containers
-        setDestinationItems(clonedItems);
-      }
-
-      setClonedItems(null);
+      // if (clonedItems) {
+      //   // Reset items to their original state in case items have been
+      //   // Dragged across containers
+      //   setDestinationItems(clonedItems);
+      // }
+      // setClonedItems(null);
     },
   });
 
@@ -347,7 +291,7 @@ export function SortableTree({
 
   return (
     <SortableContext
-      items={flattenedItems.map(({ id }) => id)}
+      items={sortedIds}
       strategy={verticalListSortingStrategy}
     >
       {flattenedItems.map(

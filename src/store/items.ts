@@ -9,6 +9,7 @@ export const itemsData = atom<TreeItems>([
     type: "Page",
     label: "Page",
     canHaveChildren: true,
+    isConstructor: false,
     children: [],
   },
   {
@@ -16,18 +17,21 @@ export const itemsData = atom<TreeItems>([
     type: "Page",
     label: "Page",
     canHaveChildren: true,
+    isConstructor: false,
     children: [
       {
         id: nanoid(6),
         type: "Section",
         label: "Section",
         canHaveChildren: true,
+        isConstructor: false,
         children: [
           {
             id: nanoid(6),
             type: "Country",
             label: "Country",
             canHaveChildren: false,
+            isConstructor: false,
             children: [],
           },
           {
@@ -35,6 +39,7 @@ export const itemsData = atom<TreeItems>([
             type: "Text Block",
             label: "First name",
             canHaveChildren: false,
+            isConstructor: false,
             children: [],
           },
           {
@@ -42,6 +47,7 @@ export const itemsData = atom<TreeItems>([
             type: "Text Input",
             label: "Last name",
             canHaveChildren: false,
+            isConstructor: false,
             children: [],
           },
         ],
@@ -53,12 +59,14 @@ export const itemsData = atom<TreeItems>([
     type: "Page",
     label: "Page",
     canHaveChildren: true,
+    isConstructor: false,
     children: [
       {
         id: nanoid(6),
         type: "Single Choice",
         label: "Single Choice",
         canHaveChildren: false,
+        isConstructor: false,
         children: [],
       },
       {
@@ -66,6 +74,7 @@ export const itemsData = atom<TreeItems>([
         type: "Multiple Choice",
         label: "Multiple Choice",
         canHaveChildren: false,
+        isConstructor: false,
         children: [],
       },
     ],

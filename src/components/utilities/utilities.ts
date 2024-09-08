@@ -123,6 +123,7 @@ export function buildTree(
     canHaveChildren: true,
     label: "",
     type: "root",
+    isConstructor: false,
   };
   const nodes: Record<string, TreeItem> = { [root.id]: root };
   const items = flattenedItems.map((item) => ({
@@ -131,11 +132,25 @@ export function buildTree(
   }));
 
   for (const item of items) {
-    const { id, children } = item;
+    const {
+      id,
+      children,
+      label,
+      type,
+      canHaveChildren,
+      isConstructor,
+    } = item;
     const parentId = item.parentId ?? root.id;
     const parent = nodes[parentId] ?? findItem(items, parentId);
 
-    nodes[id] = { id, children };
+    nodes[id] = {
+      id,
+      children,
+      label,
+      type,
+      canHaveChildren,
+      isConstructor,
+    };
     parent.children.push(item);
   }
 

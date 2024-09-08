@@ -20,23 +20,23 @@ export const Handle = forwardRef<HTMLButtonElement, ActionProps>(
           <path
             d="M1 1H19"
             stroke="#1C1C1C"
-            stroke-opacity="0.2"
-            stroke-width="2"
-            stroke-linecap="round"
+            strokeOpacity="0.2"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
           <path
             d="M1 6H19"
             stroke="#1C1C1C"
-            stroke-opacity="0.2"
-            stroke-width="2"
-            stroke-linecap="round"
+            strokeOpacity="0.2"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
           <path
             d="M1 11H19"
             stroke="#1C1C1C"
-            stroke-opacity="0.2"
-            stroke-width="2"
-            stroke-linecap="round"
+            strokeOpacity="0.2"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
         </svg>
       </Action>

@@ -50,12 +50,6 @@ export function getProjection(
     depth = minDepth;
   }
 
-  console.log("getting projection", {
-    depth,
-    maxDepth,
-    minDepth,
-    parentId: getParentId(),
-  });
   return { depth, maxDepth, minDepth, parentId: getParentId() };
 
   function getParentId() {
@@ -86,7 +80,9 @@ function getMaxDepth({
   previousItem: FlattenedItem;
 }) {
   if (previousItem) {
-    return previousItem.depth + 1;
+    return previousItem.canHaveChildren
+      ? previousItem.depth + 1
+      : previousItem.depth;
   }
 
   return 0;

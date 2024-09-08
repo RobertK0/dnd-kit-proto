@@ -23,18 +23,24 @@ interface SortableItemProps {
   containerId: UniqueIdentifier;
   id: UniqueIdentifier;
   label: string;
+  type: string;
   index: number;
   handle: boolean;
   disabled?: boolean;
+  canHaveChildren: boolean;
+  isConstructor: boolean;
 }
 
 export function SortableItem({
   disabled,
   id,
   label,
+  type,
   index,
   handle,
   containerId,
+  canHaveChildren,
+  isConstructor,
 }: SortableItemProps) {
   const {
     setNodeRef,
@@ -51,9 +57,15 @@ export function SortableItem({
       item: {
         id,
         label,
+        type,
+        canHaveChildren,
+        isConstructor,
       } as {
         id: UniqueIdentifier;
         label: string;
+        type: string;
+        isConstructor: boolean;
+        canHaveChildren: boolean;
       },
     },
   });
@@ -71,7 +83,6 @@ export function SortableItem({
         handle ? { ref: setActivatorNodeRef } : undefined
       }
       index={index}
-      color={getColor(id)}
       transition={transition}
       transform={transform}
       fadeIn={mountedWhileDragging}

@@ -5,7 +5,9 @@ export interface TreeItem {
   id: UniqueIdentifier;
   children: TreeItem[];
   collapsed?: boolean;
+  type: string;
   label: string;
+  canHaveChildren: boolean;
 }
 
 export type TreeItems = TreeItem[];
@@ -17,7 +19,9 @@ export interface FlattenedItem {
   parentId: UniqueIdentifier | null;
   depth: number;
   index: number;
+  type: string;
   label: string;
+  canHaveChildren: boolean;
 }
 
 export type SensorContext = MutableRefObject<{

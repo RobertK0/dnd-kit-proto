@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   Announcements,
@@ -48,63 +55,12 @@ import { SortableTreeItem } from "../SortableTreeItem/SortableTreeItem";
 import { SOURCE_ITEMS } from "../Vendor/Vendor";
 import { Item } from "../MultipleContainersContext/MultipleContainersContext";
 import { SortableItem } from "../Vendor/SortableItem/SortableItem";
+import { nanoid } from "nanoid";
+import { MultipleContainersOverlay } from "../MultipleContainersOverlay/MultipleContainersOverlay";
+import { useAtom } from "jotai";
+import { itemBeingEdited, itemsData } from "../../store/items";
 
 let nextId = 5;
-
-const initialItems: TreeItems = [
-  {
-    id: "Home",
-    label: "Home",
-    children: [],
-  },
-  {
-    id: "Collections",
-    label: "Collections",
-    children: [
-      {
-        id: "Spring",
-        label: "Spring",
-        children: [],
-      },
-      {
-        id: "Summer",
-        label: "Summer",
-        children: [],
-      },
-      {
-        id: "Fall",
-        label: "Fall",
-        children: [],
-      },
-      {
-        id: "Winter",
-        label: "Winter",
-        children: [],
-      },
-    ],
-  },
-  {
-    id: "About Us",
-    label: "About Us",
-    children: [],
-  },
-  {
-    id: "My Account",
-    label: "My Account",
-    children: [
-      {
-        id: "Addresses",
-        label: "Addresses",
-        children: [],
-      },
-      {
-        id: "Order History",
-        label: "Order History",
-        children: [],
-      },
-    ],
-  },
-];
 
 const measuring = {
   droppable: {
@@ -140,20 +96,22 @@ const dropAnimationConfig: DropAnimation = {
 
 interface Props {
   collapsible?: boolean;
-  defaultItems?: TreeItems;
   indentationWidth?: number;
   indicator?: boolean;
   removable?: boolean;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export function SortableTree({
   collapsible,
-  defaultItems = initialItems,
   indicator = false,
   indentationWidth = 50,
   removable,
+  setIsSidebarOpen,
 }: Props) {
-  const [items, setItems] = useState(() => defaultItems);
+  // const [items, setItems] = useState(() => defaultItems);
+
+  const [items, setItems] = useAtom(itemsData);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(
     null
   );
@@ -166,7 +124,6 @@ export function SortableTree({
     overId: UniqueIdentifier;
   } | null>(null);
 
-  console.log(items);
   const flattenedItems = useMemo(() => {
     const flattenedTree = flattenTree(items);
     const collapsedItems = flattenedTree.reduce<string[]>(
@@ -190,23 +147,23 @@ export function SortableTree({
           indentationWidth
         )
       : null;
-  const sensorContext: SensorContext = useRef({
-    items: flattenedItems,
-    offset: offsetLeft,
-  });
-  const [coordinateGetter] = useState(() =>
-    sortableTreeKeyboardCoordinates(
-      sensorContext,
-      indicator,
-      indentationWidth
-    )
-  );
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter,
-    })
-  );
+  // const sensorContext: SensorContext = useRef({
+  //   items: flattenedItems,
+  //   offset: offsetLeft,
+  // });
+  // const [coordinateGetter] = useState(() =>
+  //   sortableTreeKeyboardCoordinates(
+  //     sensorContext,
+  //     indicator,
+  //     indentationWidth
+  //   )
+  // );
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor),
+  // useSensor(KeyboardSensor, {
+  //   coordinateGetter,
+  // })
+  // );
 
   const sortedIds = useMemo(
     () => flattenedItems.map(({ id }) => id),
@@ -216,42 +173,12 @@ export function SortableTree({
     ? flattenedItems.find(({ id }) => id === activeId)
     : null;
 
-  useEffect(() => {
-    sensorContext.current = {
-      items: flattenedItems,
-      offset: offsetLeft,
-    };
-  }, [flattenedItems, offsetLeft]);
-
-  const announcements: Announcements = {
-    onDragStart({ active }) {
-      return `Picked up ${active.id}.`;
-    },
-    onDragMove({ active, over }) {
-      return getMovementAnnouncement(
-        "onDragMove",
-        active.id,
-        over?.id
-      );
-    },
-    onDragOver({ active, over }) {
-      return getMovementAnnouncement(
-        "onDragOver",
-        active.id,
-        over?.id
-      );
-    },
-    onDragEnd({ active, over }) {
-      return getMovementAnnouncement(
-        "onDragEnd",
-        active.id,
-        over?.id
-      );
-    },
-    onDragCancel({ active }) {
-      return `Moving was cancelled. ${active.id} was dropped in its original position.`;
-    },
-  };
+  // useEffect(() => {
+  //   sensorContext.current = {
+  //     items: flattenedItems,
+  //     offset: offsetLeft,
+  //   };
+  // }, [flattenedItems, offsetLeft]);
 
   //START
 
@@ -265,19 +192,28 @@ export function SortableTree({
     }))
   );
 
+  const dragStartPosition = useRef(null);
+
   useDndMonitor({
-    onDragStart() {
+    onDragStart(event) {
       setClonedItems(destinationItems);
-      console.log("dndmonitor ondragstart");
+      setIsSidebarOpen(false);
+      console.log("dndmonitor ondragstart", event);
       document.body.style.setProperty("cursor", "grabbing");
     },
-    onDragMove() {
-      console.log("dndmonitor ondragmove");
+    onDragMove(event) {
+      if (!dragStartPosition.current)
+        dragStartPosition.current =
+          event.active.data.current.container === "A" ? 79 : 0;
+
+      setOffsetLeft(event.delta.x - dragStartPosition.current);
+      //event.over.rect.left
     },
     onDragOver({ active, over }) {
       console.log("dndmonitor ondragover");
       const overId = over?.id;
-
+      setOverId(overId);
+      setActiveId(active.id);
       const overContainer = over?.data.current?.container as
         | string
         | undefined;
@@ -304,13 +240,8 @@ export function SortableTree({
       //   over
       // );
       if (activeContainer !== overContainer) {
-        setActiveId(active.id);
-        setOverId(over.id);
         // setDestinationItems((items) => {
         setItems((items) => {
-          // TODO here, find proper index instead of inserting at end
-          console.log("test2323", flattenedItems);
-
           const overIndex = items.findIndex(
             ({ id }) => id === overId
           );
@@ -318,13 +249,24 @@ export function SortableTree({
             ({ id }) => id === active.id
           );
 
+          const {
+            id,
+            label,
+            isConstructor,
+            canHaveChildren,
+            type,
+          } = active.data.current.item;
+
           return [
             ...items,
             {
-              id: active.id,
+              id,
               children: [],
               collapsed: false,
-              label: active.data.current.item.label,
+              label,
+              isConstructor,
+              canHaveChildren,
+              type,
             },
           ];
           console.log(items);
@@ -357,59 +299,110 @@ export function SortableTree({
       }
     },
     onDragEnd({ active, over }) {
-      const activeContainer = active.data.current?.container as
-        | string
-        | undefined;
+      resetState();
+      dragStartPosition.current = null;
 
-      if (!activeContainer) {
-        return;
-      }
+      console.log("OVER EVENT", items);
 
-      const overId = over?.id;
+      if (!projected || !over) return;
 
-      if (overId == null) {
-        return;
-      }
+      const { depth, parentId } = projected;
 
-      const overContainer = over?.data.current?.container as
-        | string
-        | undefined;
+      const clonedItems: FlattenedItem[] = JSON.parse(
+        JSON.stringify(flattenTree(items))
+      );
 
-      if (overContainer === "A") {
-        return;
-      }
+      //Index of item that the item being dropped is over
+      const overIndex = clonedItems.findIndex(
+        ({ id }) => id === over.id
+      );
 
-      if (overContainer) {
-        setDestinationItems((items) => {
-          const overIndex = items.findIndex(
-            ({ id }) => id === overId
-          );
-          const activeIndex = items.findIndex(
-            ({ id }) => id === active.id
-          );
+      //Index of item being dropped
+      const activeIndex = clonedItems.findIndex(
+        ({ id }) => id === active.id
+      );
 
-          let nextItems = items;
+      //Item being dropped
+      const activeTreeItem = clonedItems[activeIndex];
+      console.log(
+        "utilities,",
+        activeTreeItem.isConstructor,
+        activeTreeItem.id
+      );
+      const id = activeTreeItem.isConstructor
+        ? nanoid(6)
+        : activeTreeItem.id;
 
-          if (activeIndex !== overIndex) {
-            nextItems = arrayMove(items, activeIndex, overIndex);
-          }
+      clonedItems[activeIndex] = {
+        ...activeTreeItem,
+        depth,
+        parentId,
+        id,
+      };
 
-          if (SOURCE_ITEMS.find(({ id }) => id === active.id)) {
-            const lastActiveIndex = nextItems.findIndex(
-              ({ id }) => id === active.id
-            );
+      const sortedItems = arrayMove(
+        clonedItems,
+        activeIndex,
+        overIndex
+      );
 
-            console.log("lastActiveIndex", lastActiveIndex);
+      const newItems = buildTree(sortedItems);
 
-            nextItems[lastActiveIndex] = {
-              id: nextId,
-              label: `${active.id} -> B${nextId++}`,
-            };
-          }
+      setItems(newItems);
 
-          return nextItems;
-        });
-      }
+      // const activeContainer = active.data.current?.container as
+      //   | string
+      //   | undefined;
+
+      // if (!activeContainer) {
+      //   return;
+      // }
+
+      // const overId = over?.id;
+
+      // if (overId == null) {
+      //   return;
+      // }
+
+      // const overContainer = over?.data.current?.container as
+      //   | string
+      //   | undefined;
+
+      // if (overContainer === "A") {
+      //   return;
+      // }
+
+      // if (overContainer) {
+      //   setDestinationItems((items) => {
+      //     const overIndex = items.findIndex(
+      //       ({ id }) => id === overId
+      //     );
+      //     const activeIndex = items.findIndex(
+      //       ({ id }) => id === active.id
+      //     );
+
+      //     let nextItems = items;
+
+      //     if (activeIndex !== overIndex) {
+      //       nextItems = arrayMove(items, activeIndex, overIndex);
+      //     }
+
+      //     if (SOURCE_ITEMS.find(({ id }) => id === active.id)) {
+      //       const lastActiveIndex = nextItems.findIndex(
+      //         ({ id }) => id === active.id
+      //       );
+
+      //       console.log("lastActiveIndex", lastActiveIndex);
+
+      //       nextItems[lastActiveIndex] = {
+      //         id: nextId,
+      //         label: `${active.id} -> B${nextId++}`,
+      //       };
+      //     }
+
+      //     return nextItems;
+      //   });
+      // }
     },
     onDragCancel() {
       if (clonedItems) {
@@ -424,8 +417,10 @@ export function SortableTree({
 
   //END
 
+  const [editedId, setEditedId] = useAtom(itemBeingEdited);
+
   useEffect(() => {
-    console.log(flattenedItems);
+    console.log("utilities", flattenedItems);
     console.log(
       "test",
       flattenedItems.map(({ id }) => id)
@@ -433,50 +428,59 @@ export function SortableTree({
   }, [flattenedItems]);
 
   return (
-    <DndContext
-      accessibility={{ announcements }}
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      measuring={measuring}
-      onDragStart={handleDragStart}
-      onDragMove={handleDragMove}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
+    // <DndContext
+    //   accessibility={{ announcements }}
+    //   sensors={sensors}
+    //   collisionDetection={closestCenter}
+    //   measuring={measuring}
+    //   onDragStart={handleDragStart}
+    //   onDragMove={handleDragMove}
+    //   onDragOver={handleDragOver}
+    //   onDragEnd={handleDragEnd}
+    //   onDragCancel={handleDragCancel}
+    // >
+    <SortableContext
+      // items={sortedIds}
+      items={flattenedItems.map(({ id }) => id)}
+      strategy={verticalListSortingStrategy}
     >
-      <SortableContext
-        // items={sortedIds}
-        items={flattenedItems.map(({ id }) => id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {flattenedItems.map(
-          ({ id, label, children, collapsed, depth }) => (
-            <SortableTreeItem
-              containerId="B"
-              key={id}
-              id={id}
-              value={`${id}`}
-              label={`${label}`}
-              depth={
-                id === activeId && projected
-                  ? projected.depth
-                  : depth
-              }
-              indentationWidth={indentationWidth}
-              indicator={indicator}
-              collapsed={Boolean(collapsed && children.length)}
-              onCollapse={
-                collapsible && children.length
-                  ? () => handleCollapse(id)
-                  : undefined
-              }
-              onRemove={
-                removable ? () => handleRemove(id) : undefined
-              }
-            />
-          )
-        )}
-        {/* {destinationItems.map((value, index) => (
+      {flattenedItems.map(
+        ({
+          id,
+          label,
+          type,
+          children,
+          collapsed,
+          depth,
+          canHaveChildren,
+        }) => (
+          <SortableTreeItem
+            selected={editedId === id}
+            containerId="B"
+            key={id}
+            id={id}
+            value={`${id}`}
+            label={`${label}`}
+            type={type}
+            depth={
+              id === activeId && projected ? projected.depth : depth
+            }
+            canHaveChildren={canHaveChildren}
+            indentationWidth={indentationWidth}
+            indicator={indicator}
+            collapsed={Boolean(collapsed && children.length)}
+            onCollapse={
+              collapsible && children.length
+                ? () => handleCollapse(id)
+                : undefined
+            }
+            onRemove={
+              removable ? () => handleRemove(id) : undefined
+            }
+          />
+        )
+      )}
+      {/* {destinationItems.map((value, index) => (
         <SortableItem
           key={value.id}
           id={value.id}
@@ -486,7 +490,7 @@ export function SortableTree({
           containerId={"B"}
         />
       ))} */}
-        {/* {flattenedItems.map(
+      {/* {flattenedItems.map(
         ({ id, label, children, collapsed, depth }, index) => (
           <>
             <SortableTreeItem
@@ -518,8 +522,9 @@ export function SortableTree({
           </>
         )
       )} */}
+      <MultipleContainersOverlay />
 
-        {/* {createPortal(
+      {/* {createPortal(
         <DragOverlay
           dropAnimation={dropAnimationConfig}
           modifiers={indicator ? [adjustTranslate] : undefined}
@@ -537,8 +542,8 @@ export function SortableTree({
         </DragOverlay>,
         document.body
       )} */}
-      </SortableContext>
-    </DndContext>
+    </SortableContext>
+    // </DndContext>
   );
 
   function handleDragStart({
@@ -569,32 +574,32 @@ export function SortableTree({
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {
-    // resetState();
-    // if (projected && over) {
-    //   const { depth, parentId } = projected;
-    //   const clonedItems: FlattenedItem[] = JSON.parse(
-    //     JSON.stringify(flattenTree(items))
-    //   );
-    //   const overIndex = clonedItems.findIndex(
-    //     ({ id }) => id === over.id
-    //   );
-    //   const activeIndex = clonedItems.findIndex(
-    //     ({ id }) => id === active.id
-    //   );
-    //   const activeTreeItem = clonedItems[activeIndex];
-    //   clonedItems[activeIndex] = {
-    //     ...activeTreeItem,
-    //     depth,
-    //     parentId,
-    //   };
-    //   const sortedItems = arrayMove(
-    //     clonedItems,
-    //     activeIndex,
-    //     overIndex
-    //   );
-    //   const newItems = buildTree(sortedItems);
-    //   setItems(newItems);
-    // }
+    resetState();
+    if (projected && over) {
+      const { depth, parentId } = projected;
+      const clonedItems: FlattenedItem[] = JSON.parse(
+        JSON.stringify(flattenTree(items))
+      );
+      const overIndex = clonedItems.findIndex(
+        ({ id }) => id === over.id
+      );
+      const activeIndex = clonedItems.findIndex(
+        ({ id }) => id === active.id
+      );
+      const activeTreeItem = clonedItems[activeIndex];
+      clonedItems[activeIndex] = {
+        ...activeTreeItem,
+        depth,
+        parentId,
+      };
+      const sortedItems = arrayMove(
+        clonedItems,
+        activeIndex,
+        overIndex
+      );
+      const newItems = buildTree(sortedItems);
+      setItems(newItems);
+    }
   }
 
   function handleDragCancel() {
@@ -606,6 +611,7 @@ export function SortableTree({
     setActiveId(null);
     setOffsetLeft(0);
     setCurrentPosition(null);
+    dragStartPosition.current = null;
 
     document.body.style.setProperty("cursor", "");
   }
@@ -620,82 +626,6 @@ export function SortableTree({
         return !value;
       })
     );
-  }
-
-  function getMovementAnnouncement(
-    eventName: string,
-    activeId: UniqueIdentifier,
-    overId?: UniqueIdentifier
-  ) {
-    if (overId && projected) {
-      if (eventName !== "onDragEnd") {
-        if (
-          currentPosition &&
-          projected.parentId === currentPosition.parentId &&
-          overId === currentPosition.overId
-        ) {
-          return;
-        } else {
-          setCurrentPosition({
-            parentId: projected.parentId,
-            overId,
-          });
-        }
-      }
-
-      const clonedItems: FlattenedItem[] = JSON.parse(
-        JSON.stringify(flattenTree(items))
-      );
-      const overIndex = clonedItems.findIndex(
-        ({ id }) => id === overId
-      );
-      const activeIndex = clonedItems.findIndex(
-        ({ id }) => id === activeId
-      );
-      const sortedItems = arrayMove(
-        clonedItems,
-        activeIndex,
-        overIndex
-      );
-
-      const previousItem = sortedItems[overIndex - 1];
-
-      let announcement;
-      const movedVerb =
-        eventName === "onDragEnd" ? "dropped" : "moved";
-      const nestedVerb =
-        eventName === "onDragEnd" ? "dropped" : "nested";
-
-      if (!previousItem) {
-        const nextItem = sortedItems[overIndex + 1];
-        announcement = `${activeId} was ${movedVerb} before ${nextItem.id}.`;
-      } else {
-        if (projected.depth > previousItem.depth) {
-          announcement = `${activeId} was ${nestedVerb} under ${previousItem.id}.`;
-        } else {
-          let previousSibling: FlattenedItem | undefined =
-            previousItem;
-          while (
-            previousSibling &&
-            projected.depth < previousSibling.depth
-          ) {
-            const parentId: UniqueIdentifier | null =
-              previousSibling.parentId;
-            previousSibling = sortedItems.find(
-              ({ id }) => id === parentId
-            );
-          }
-
-          if (previousSibling) {
-            announcement = `${activeId} was ${movedVerb} after ${previousSibling.id}.`;
-          }
-        }
-      }
-
-      return announcement;
-    }
-
-    return;
   }
 }
 

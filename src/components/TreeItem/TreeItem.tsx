@@ -20,6 +20,7 @@ export interface TreeItemProps
   indentationWidth: number;
   value: string;
   label: string;
+  type: string;
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
@@ -38,6 +39,7 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
       handleProps,
       indentationWidth,
       label,
+      type,
       indicator,
       collapsed,
       transform,
@@ -82,6 +84,7 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
             </Action>
           )}
           <span className={styles.Text}>{label}</span>
+          <span className={styles.Type}>{type}</span>
           {!clone && onRemove && <Remove onClick={onRemove} />}
           {clone && childCount && childCount > 1 ? (
             <span className={styles.Count}>{childCount}</span>

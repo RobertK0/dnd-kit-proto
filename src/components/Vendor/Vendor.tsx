@@ -8,10 +8,7 @@ import {
 import { Item } from "../Item/Item";
 import { createRange } from "../utilities/utilities";
 import { Container } from "../Container/Container";
-import {
-  getColor,
-  SortableItem,
-} from "./SortableItem/SortableItem";
+import { SortableItem } from "./SortableItem/SortableItem";
 import { nanoid } from "nanoid";
 
 export const SOURCE_ITEMS = [

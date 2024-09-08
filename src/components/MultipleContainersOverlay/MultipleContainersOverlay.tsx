@@ -11,7 +11,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { Item } from "../Item/Item";
-import { getColor } from "../Vendor/SortableItem/SortableItem";
 import { CSS } from "@dnd-kit/utilities";
 
 const dropAnimation: DropAnimation = {

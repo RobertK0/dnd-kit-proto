@@ -9,6 +9,7 @@ export interface TreeItem {
   label: string;
   canHaveChildren: boolean;
   isConstructor: boolean;
+  depthLabel: string;
 }
 
 export type TreeItems = TreeItem[];

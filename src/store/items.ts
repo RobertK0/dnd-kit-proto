@@ -10,6 +10,7 @@ export const itemsData = atom<TreeItems>([
     label: "Page",
     canHaveChildren: true,
     isConstructor: false,
+    depthLabel: "1",
     children: [],
   },
   {
@@ -18,6 +19,7 @@ export const itemsData = atom<TreeItems>([
     label: "Page",
     canHaveChildren: true,
     isConstructor: false,
+    depthLabel: "2",
     children: [
       {
         id: nanoid(6),
@@ -25,6 +27,7 @@ export const itemsData = atom<TreeItems>([
         label: "Section",
         canHaveChildren: true,
         isConstructor: false,
+        depthLabel: "2.1",
         children: [
           {
             id: nanoid(6),
@@ -32,6 +35,7 @@ export const itemsData = atom<TreeItems>([
             label: "Country",
             canHaveChildren: false,
             isConstructor: false,
+            depthLabel: "2.1.1",
             children: [],
           },
           {
@@ -40,6 +44,7 @@ export const itemsData = atom<TreeItems>([
             label: "First name",
             canHaveChildren: false,
             isConstructor: false,
+            depthLabel: "2.1.2",
             children: [],
           },
           {
@@ -48,6 +53,7 @@ export const itemsData = atom<TreeItems>([
             label: "Last name",
             canHaveChildren: false,
             isConstructor: false,
+            depthLabel: "2.1.3",
             children: [],
           },
         ],
@@ -60,6 +66,7 @@ export const itemsData = atom<TreeItems>([
     label: "Page",
     canHaveChildren: true,
     isConstructor: false,
+    depthLabel: "3",
     children: [
       {
         id: nanoid(6),
@@ -67,6 +74,7 @@ export const itemsData = atom<TreeItems>([
         label: "Single Choice",
         canHaveChildren: false,
         isConstructor: false,
+        depthLabel: "3.1",
         children: [],
       },
       {
@@ -75,6 +83,7 @@ export const itemsData = atom<TreeItems>([
         label: "Multiple Choice",
         canHaveChildren: false,
         isConstructor: false,
+        depthLabel: "3.2",
         children: [],
       },
     ],

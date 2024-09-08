@@ -29,6 +29,7 @@ export function SortableTreeItem({
   depth,
   selected,
   label,
+  depthLabel,
   type,
   canHaveChildren,
   containerId,
@@ -45,11 +46,13 @@ export function SortableTreeItem({
         label,
         type,
         canHaveChildren,
+        depthLabel,
       } as {
         id: UniqueIdentifier;
         label: string;
         type: string;
         canHaveChildren: boolean;
+        depthLabel: string;
       },
     },
     animateLayoutChanges,
@@ -87,6 +90,8 @@ export function SortableTreeItem({
       label={label}
       style={style}
       depth={depth}
+      selected={selected}
+      depthLabel={depthLabel}
       type={type}
       ghost={isDragging}
       disableSelection={iOS}

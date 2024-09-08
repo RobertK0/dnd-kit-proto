@@ -114,6 +114,22 @@ export function flattenTree(items: TreeItems): FlattenedItem[] {
   return flatten(items);
 }
 
+function assignDepthLabels(node: TreeItem, depthLabel: string) {
+  // Set the depth label for the current node
+  node.depthLabel = depthLabel;
+
+  // If the node has children, recursively assign depth labels to them
+  if (node.children && node.children.length > 0) {
+    node.children.forEach((child, index) => {
+      // Generate a new depth label for the child node
+      const newDepthLabel = `${depthLabel}.${index + 1}`;
+
+      // Recursively call the function on the child node
+      assignDepthLabels(child, newDepthLabel);
+    });
+  }
+}
+
 export function buildTree(
   flattenedItems: FlattenedItem[]
 ): TreeItems {
@@ -124,6 +140,7 @@ export function buildTree(
     label: "",
     type: "root",
     isConstructor: false,
+    depthLabel: "",
   };
   const nodes: Record<string, TreeItem> = { [root.id]: root };
   const items = flattenedItems.map((item) => ({
@@ -139,6 +156,7 @@ export function buildTree(
       type,
       canHaveChildren,
       isConstructor,
+      depthLabel,
     } = item;
     const parentId = item.parentId ?? root.id;
     const parent = nodes[parentId] ?? findItem(items, parentId);
@@ -150,10 +168,14 @@ export function buildTree(
       type,
       canHaveChildren,
       isConstructor,
+      depthLabel,
     };
     parent.children.push(item);
   }
 
+  root.children.forEach((item, index) => {
+    assignDepthLabels(item, `${index + 1}`);
+  });
   return root.children;
 }
 

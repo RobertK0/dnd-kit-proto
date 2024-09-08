@@ -131,6 +131,7 @@ export function SortableTree({
             isConstructor,
             canHaveChildren,
             type,
+            depthLabel,
           } = active.data.current?.item;
 
           return [
@@ -143,6 +144,7 @@ export function SortableTree({
               isConstructor,
               canHaveChildren,
               type,
+              depthLabel,
             },
           ];
 
@@ -298,6 +300,7 @@ export function SortableTree({
         ({
           id,
           label,
+          depthLabel,
           type,
           children,
           collapsed,
@@ -310,6 +313,7 @@ export function SortableTree({
             key={id}
             id={id}
             value={`${id}`}
+            depthLabel={depthLabel}
             label={`${label}`}
             type={type}
             depth={

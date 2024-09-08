@@ -5,6 +5,7 @@ import styles from "./TreeItem.module.css";
 import { Action } from "../Item/Action/Action";
 import { Handle } from "../Item/Handle/Handle";
 import { Remove } from "../Item/Remove/Remove";
+import styled, { css } from "styled-components";
 
 export interface TreeItemProps
   extends Omit<HTMLAttributes<HTMLLIElement>, "id"> {
@@ -21,10 +22,57 @@ export interface TreeItemProps
   value: string;
   label: string;
   type: string;
+  depthLabel: string;
+  selected: boolean;
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
 }
+
+const StyledTypeBadge = styled.span`
+  background-color: #ae1065;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+`;
+
+const StyledDepthLabel = styled.span`
+  padding: 6px 12px;
+  border: 1px solid #1c1c1c4d;
+  border-radius: 60px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1c1c1c4d;
+  transition: all 0.3s ease;
+`;
+
+const StyledTreeItem = styled.div<{ $selected: boolean }>`
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  background-color: #f3f3f3;
+  border: 1px solid #dedede;
+  color: #222;
+  box-sizing: border-box;
+
+  ${({ $selected }) =>
+    $selected
+      ? css`
+          ${StyledDepthLabel} {
+            border-color: #ffffff80;
+            color: #ffffff80;
+          }
+
+          ${StyledTypeBadge} {
+            background-color: #d54593;
+          }
+        `
+      : ``}
+`;
 
 export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
   (
@@ -38,6 +86,8 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
       handleProps,
       indentationWidth,
       label,
+      selected,
+      depthLabel,
       type,
       indicator,
       collapsed,
@@ -68,7 +118,11 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
         }
         {...props}
       >
-        <div className={styles.TreeItem} ref={ref} style={style}>
+        <StyledTreeItem
+          $selected={selected}
+          ref={ref}
+          style={style}
+        >
           <Handle {...handleProps} />
           {onCollapse && (
             <Action
@@ -81,13 +135,19 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(
               {collapseIcon}
             </Action>
           )}
+          <StyledDepthLabel>{depthLabel}</StyledDepthLabel>
           <span className={styles.Text}>{label}</span>
-          <span className={styles.Type}>{type}</span>
-          {!clone && onRemove && <Remove onClick={onRemove} />}
+          <StyledTypeBadge>{type}</StyledTypeBadge>
+          {!clone && onRemove && (
+            <Remove
+              style={{ marginLeft: "auto" }}
+              onClick={onRemove}
+            />
+          )}
           {clone && childCount && childCount > 1 ? (
             <span className={styles.Count}>{childCount}</span>
           ) : null}
-        </div>
+        </StyledTreeItem>
       </li>
     );
   }

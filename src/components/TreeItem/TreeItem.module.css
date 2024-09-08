@@ -73,18 +73,28 @@
   display: flex;
   align-items: center;
   padding: var(--vertical-padding) 10px;
-  background-color: #fff;
+  background-color: #f3f3f3;
   border: 1px solid #dedede;
   color: #222;
   box-sizing: border-box;
 }
 
 .Text {
-  flex-grow: 1;
+  margin-right: 10px;
   padding-left: 0.5rem;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: 14px;
+}
+
+.Type {
+  background-color: #ae1065;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-weight: 600;
 }
 
 .Count {

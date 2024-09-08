@@ -115,20 +115,6 @@
     opacity: 1;
   }
 
-  &.color:before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 0;
-    height: 100%;
-    width: 3px;
-    display: block;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-    background-color: var(--color);
-  }
-
   &:hover {
     .Remove {
       visibility: visible;

@@ -117,7 +117,13 @@ export function flattenTree(items: TreeItems): FlattenedItem[] {
 export function buildTree(
   flattenedItems: FlattenedItem[]
 ): TreeItems {
-  const root: TreeItem = { id: "root", children: [] };
+  const root: TreeItem = {
+    id: "root",
+    children: [],
+    canHaveChildren: true,
+    label: "",
+    type: "root",
+  };
   const nodes: Record<string, TreeItem> = { [root.id]: root };
   const items = flattenedItems.map((item) => ({
     ...item,

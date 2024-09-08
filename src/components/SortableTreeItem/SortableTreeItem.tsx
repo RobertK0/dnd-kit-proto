@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import { CSSProperties } from "react";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import {
   AnimateLayoutChanges,
@@ -8,7 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { iOS } from "../utilities/utilities";
 import { TreeItem, TreeItemProps } from "../TreeItem/TreeItem";
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { itemBeingEdited } from "../../store/items";
 
 interface Props extends TreeItemProps {
@@ -34,7 +34,7 @@ export function SortableTreeItem({
   containerId,
   ...props
 }: Props) {
-  const [editedId, setEditedId] = useAtom(itemBeingEdited);
+  const setEditedId = useSetAtom(itemBeingEdited);
 
   const hookParams = {
     id,
@@ -81,7 +81,6 @@ export function SortableTreeItem({
     <TreeItem
       onClick={() => {
         setEditedId(id);
-        console.log("asdasd", id);
       }}
       ref={setDraggableNodeRef}
       wrapperRef={setDroppableNodeRef}
@@ -90,7 +89,6 @@ export function SortableTreeItem({
       depth={depth}
       type={type}
       ghost={isDragging}
-      // ghost={false}
       disableSelection={iOS}
       disableInteraction={isSorting}
       handleProps={{

@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Editor } from "./components/Editor/Editor";
 import { MultipleContainersContext } from "./components/MultipleContainersContext/MultipleContainersContext";
-import { MultipleContainersOverlay } from "./components/MultipleContainersOverlay/MultipleContainersOverlay";
 import { SortableTree } from "./components/SortableTree/SortableTree";
 import { Taskbar } from "./components/Taskbar/Taskbar";
 import { Vendor } from "./components/Vendor/Vendor";
@@ -30,7 +29,6 @@ function App() {
                 removable
               />
             </div>
-            {/* <MultipleContainersOverlay /> */}
           </MultipleContainersContext>
           <div>
             <Editor />

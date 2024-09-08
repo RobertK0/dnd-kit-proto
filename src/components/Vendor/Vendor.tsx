@@ -6,7 +6,6 @@ import {
   useDndMonitor,
 } from "@dnd-kit/core";
 import { Item } from "../Item/Item";
-import { createRange } from "../utilities/utilities";
 import { Container } from "../Container/Container";
 import { SortableItem } from "./SortableItem/SortableItem";
 import { nanoid } from "nanoid";

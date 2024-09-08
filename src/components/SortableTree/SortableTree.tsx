@@ -59,11 +59,6 @@ export function SortableTree({
     null
   );
   const [offsetLeft, setOffsetLeft] = useState(0);
-  const [currentPosition, setCurrentPosition] = useState<{
-    parentId: UniqueIdentifier | null;
-    overId: UniqueIdentifier;
-  } | null>(null);
-
   const flattenedItems = useMemo(() => {
     const flattenedTree = flattenTree(items);
     const collapsedItems = flattenedTree.reduce<string[]>(
@@ -406,18 +401,18 @@ export function SortableTree({
   function handleDragStart({
     active: { id: activeId },
   }: DragStartEvent) {
-    console.log("flattenedItems", flattenedItems);
-    setActiveId(activeId);
-    setOverId(activeId);
-    const activeItem = flattenedItems.find(
-      ({ id }) => id === activeId
-    );
-    if (activeItem) {
-      setCurrentPosition({
-        parentId: activeItem.parentId,
-        overId: activeId,
-      });
-    }
+    // console.log("flattenedItems", flattenedItems);
+    // setActiveId(activeId);
+    // setOverId(activeId);
+    // const activeItem = flattenedItems.find(
+    //   ({ id }) => id === activeId
+    // );
+    // if (activeItem) {
+    // setCurrentPosition({
+    //   parentId: activeItem.parentId,
+    //   overId: activeId,
+    // });
+    // }
     document.body.style.setProperty("cursor", "grabbing");
   }
 
@@ -458,7 +453,6 @@ export function SortableTree({
     setOverId(null);
     setActiveId(null);
     setOffsetLeft(0);
-    setCurrentPosition(null);
     dragStartPosition.current = null;
 
     document.body.style.setProperty("cursor", "");
